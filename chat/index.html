@@ -1,0 +1,123 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Chat App</title>
+
+    <style>
+      body {
+        font-family: Arial;
+        background: #f2f2f2;
+        text-align: center;
+      }
+
+      #chat {
+        width: 350px;
+        height: 400px;
+        margin: auto;
+        background: white;
+        overflow-y: auto;
+        padding: 10px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .msg {
+        padding: 8px;
+        margin: 5px;
+        border-radius: 8px;
+        text-align: left;
+        background: #d1e7ff;
+      }
+
+      .me {
+        background: #c2ffc2;
+        text-align: right;
+      }
+
+      input {
+        padding: 10px;
+        width: 200px;
+      }
+
+      button {
+        padding: 10px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h2>💬 Simple Chat</h2>
+
+    <div id="chat"></div>
+
+    <br />
+
+    <input id="msg" placeholder="Type message..." />
+    <button onclick="sendMsg()">Send</button>
+
+    <!-- Firebase (CDN version - correct one) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+    <script>
+      // Ask username
+      let username = prompt("Enter your name");
+      if (!username) username = "User";
+
+      // ✅ YOUR NEW CONFIG (correctly placed)
+      const firebaseConfig = {
+        apiKey: "AIzaSyCCebvEorqcv1h_6e-tJQlo4MPG9WXiIf0",
+        authDomain: "web-chat-93bab.firebaseapp.com",
+        projectId: "web-chat-93bab",
+      };
+
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+
+      // Send message
+      function sendMsg() {
+        let text = document.getElementById("msg").value;
+
+        if (text.trim() === "") return;
+
+        db.collection("messages").add({
+          name: username,
+          message: text,
+          time: Date.now(),
+        });
+
+        document.getElementById("msg").value = "";
+      }
+
+      // Press Enter to send
+      document.getElementById("msg").addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+          sendMsg();
+        }
+      });
+
+      // Receive messages (real-time)
+      db.collection("messages")
+        .orderBy("time")
+        .onSnapshot((snapshot) => {
+          let chat = document.getElementById("chat");
+          chat.innerHTML = "";
+
+          snapshot.forEach((doc) => {
+            let data = doc.data();
+            let className = data.name === username ? "msg me" : "msg";
+
+            chat.innerHTML += `
+              <div class="${className}">
+                <b>${data.name}:</b> ${data.message}
+              </div>
+            `;
+          });
+
+          chat.scrollTop = chat.scrollHeight;
+        });
+    </script>
+  </body>
+</html>
