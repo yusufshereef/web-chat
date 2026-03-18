@@ -44,7 +44,7 @@ const usernamePattern = /^[a-zA-Z0-9_]{3,30}$/;
 const minPasswordLength = 4;
 
 function isAdminCredentials(userId, password) {
-  return userId === "admin" && password === "admin";
+  return userId === "admin" && password === "6969";
 }
 
 function normalizeUsername(username) {
@@ -124,7 +124,6 @@ function setUsersBusy(isBusy) {
 
 function renderUsersList(users) {
   usersList.innerHTML = "";
-  const canDeleteUsers = Boolean(currentUser && currentUser.isAdmin);
 
   if (users.length === 0) {
     const empty = document.createElement("p");
@@ -156,10 +155,7 @@ function renderUsersList(users) {
     actionBtn.dataset.userId = user.id;
     actionBtn.dataset.username = user.username;
 
-    if (!canDeleteUsers) {
-      actionBtn.disabled = true;
-      actionBtn.title = "Only admin can delete users.";
-    } else if (user.id === "admin") {
+    if (user.id === "admin") {
       actionBtn.disabled = true;
       actionBtn.title = "Admin account cannot be deleted.";
     }
